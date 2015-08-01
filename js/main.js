@@ -1,6 +1,5 @@
 var App;
 
-;
 (function (global, document, BUILD, $, d3, Handlebars) {
 
     "use strict";
@@ -9,6 +8,7 @@ var App;
 
     App.params = {
         width: 960,
+        height: 450,
         selectedIds: []
     };
 
@@ -70,10 +70,13 @@ var App;
     };
 
     App.filesLoaded = function (error, results) {
-        App.graph = d3.politicos('timeline-candidatos', App.params.width, results[2]);
+        var info_personas = results[0];
+        var info_trayectorias = results[1];
+        var info_entidades = results[2];
 
-        App.dataLoaded(results[0]);
-        App.detailsLoaded(results[1]);
+        App.graph = d3.politicos('timeline-candidatos', App.params.width, info_entidades);
+        App.dataLoaded(info_personas);
+        App.detailsLoaded(info_trayectorias);
 
         if (App.params.selectedIds.length > 0) {
             App.selectInitial();
@@ -91,9 +94,7 @@ var App;
     };
 
     App.dataLoaded = function (data) {
-
         App.dataFicha = data;
-
         App.dataCandidato = d3.nest()
             .key(function (d) {
                 return parseInt(d.id);
@@ -404,5 +405,4 @@ window.onload = function () {
     App.init();
     MiniShare.init(opts);
     Shadowbox.init();
-
 }

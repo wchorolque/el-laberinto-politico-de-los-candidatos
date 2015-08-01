@@ -64,7 +64,6 @@ d3.politicos = function (containerId, width, partidoDetalle) {
     }
 
     function _setScales() {
-
         if (!x) {
             //Scales
             x = d3.scale.ordinal()
@@ -73,15 +72,12 @@ d3.politicos = function (containerId, width, partidoDetalle) {
 
         }
 
-
         y = d3.scale.ordinal()
             .domain(yData)
             .rangePoints([padding_top, (partido_height * yData.length)]);
-
     }
 
     function _createChart() {
-
         if (!chart) {
             //create svg
             chart = d3.select('#' + containerId)
@@ -90,14 +86,12 @@ d3.politicos = function (containerId, width, partidoDetalle) {
                 .attr('class', 'graph');
         }
 
-        chart.transition().attr('height', padding_top + (partido_height * yData.length) + padding_top_axis + padding_bottom + partido_guia_height);
-
+        var chart_height = padding_top + (partido_height * yData.length) + padding_top_axis + padding_bottom + partido_guia_height;
+        chart.transition().attr('height', chart_height);
     }
 
     function _createAxis() {
-
         if (!gxAxis) {
-
             // Años a mostrar en escala
             var anios = [2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015];
 
@@ -213,7 +207,6 @@ d3.politicos = function (containerId, width, partidoDetalle) {
                 .attr("y", 10)
                 .attr("width", 8)
                 .attr("height", 14);
-
         }
 
         referenceLabelBottom.transition()
@@ -251,11 +244,9 @@ d3.politicos = function (containerId, width, partidoDetalle) {
 
         var newTexts = gyAxis.selectAll('text')
             .call(_adjust_labels);
-
     }
 
     function _createHover() {
-
         if (!gyHover) {
             gyHover = chart.append('g')
                 .attr('class', 'y-hover')
@@ -301,11 +292,9 @@ d3.politicos = function (containerId, width, partidoDetalle) {
                 }
             });
         });
-
     }
 
     function _createGuias() {
-
         if (!guias) {
             guias = chart.append("g")
                 .attr("class", "guia-container")
@@ -366,14 +355,12 @@ d3.politicos = function (containerId, width, partidoDetalle) {
                 fin = y(d.values[d.values.length - 1].id_partido) + partido_guia_height / 2
                 return fin - inicio;
             });
-
     }
 
     function _adjust_labels(els) {
         $(els[0]).each(function (i, e) {
             _create_multiline(e);
         });
-
     }
 
     function _create_multiline(e) {
@@ -668,11 +655,8 @@ d3.politicos = function (containerId, width, partidoDetalle) {
 
     return {
         update: function (newData, extraData) {
-
             rawData = newData;
-
             var temp;
-
             referenceData = d3.nest()
                 .key(function (d) {
                     return d.id;
