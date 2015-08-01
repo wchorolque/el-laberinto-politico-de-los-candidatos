@@ -66,7 +66,7 @@ d3.politicos = function(containerId,width,partidoDetalle) {
     if(!x){
       //Scales
       x = d3.scale.ordinal()
-         .domain(d3.range(2000, 2015))
+         .domain(d3.range(2005, 2017)) // Rango de Años para la escala superior e inferior
          .rangePoints([0, width-left_width-padding_right]);
 
     }
@@ -96,7 +96,8 @@ d3.politicos = function(containerId,width,partidoDetalle) {
 
     if(!gxAxis){
 
-      var anios = [2001,2003, 2005, 2007, 2009, 2011, 2013];
+        // Años a mostrar en escala
+      var anios = [2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015];
 
       xAxis = d3.svg.axis()
         .scale(x)
@@ -173,7 +174,7 @@ d3.politicos = function(containerId,width,partidoDetalle) {
 
       referencesGrid.append("svg:image")
           .attr("xlink:href", BUILD+"img/dArrow.png")
-          .attr("x", 80)
+          .attr("x", 100)
           .attr("y", 42)
           .attr("width", 14)
           .attr("height", 12);
@@ -189,19 +190,19 @@ d3.politicos = function(containerId,width,partidoDetalle) {
       referenceLabelTop.append("text")
           .attr("x", 7)
           .attr("y", 0 + 22)
-          .text( "ELECCIONES" )
+          .text( "GESTION" )
           .attr("class", "label-reference");
 
       referenceLabelTop.append("text")
-          .attr("x", 7)
+          .attr("x", 5)
           .attr("y", padding_top_axis + 24)
-          .text( "PARTIDOS" )
+          .text( "MINISTERIOS" )
           .attr("class", "label-reference");
 
       referenceLabelBottom.append("text")
           .attr("x", 7)
           .attr("y", 0 + 22)
-          .text( "ELECCIONES" )
+          .text( "GESTIÓN" )
           .attr("class", "label-reference");
 
       referenceLabelBottom.append("svg:image")

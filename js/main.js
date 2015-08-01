@@ -12,7 +12,7 @@ var App;
     };
 
     //Data
-    App.dataUrl = 'https://docs.google.com/spreadsheet/pub?key=0AjbfzXKdfMPDdEozb3g3dVRCbWdlT2tjeWppUEZ1LXc&output=csv&gid=';
+    App.dataUrl = 'https://docs.google.com/spreadsheets/d/1U2fp0D3ZEJbfdN4-4UxTt4qGkfWkrSZR2BYhRlCj3Ao/edit#gid=0';
     App.dataFicha;
     App.dataCandidato;
     App.dataDetalle;
@@ -51,9 +51,9 @@ var App;
         App.setSizes();
 
         queue()
-          .defer(d3.csv, BUILD+'data/candidatos.csv')
-          .defer(d3.csv, BUILD+'data/trayectorias.csv')
-          .defer(d3.csv, BUILD+'data/partidos.csv')
+          .defer(d3.csv, BUILD+'data/ministros.csv')
+          .defer(d3.csv, BUILD+'data/gestiones.csv')
+          .defer(d3.csv, BUILD+'data/ministerios.csv')
           .awaitAll(App.filesLoaded);
 
     };
@@ -129,7 +129,7 @@ var App;
     }
 
     App.toggleSlider = function() {
-        var h = (App.$sliderContainer.height()==0)?192:0;
+        var h = (App.$sliderContainer.height()==0)?450:0;
         App.animateSliderContainer(h);
     }
 
@@ -322,7 +322,7 @@ var App;
     };
 
     App.cleanGraph = function(){
-        App.animateSliderContainer(192);
+        App.animateSliderContainer(450);
         App.graph.update([],[]);
     };
 
