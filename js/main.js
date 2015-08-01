@@ -39,7 +39,7 @@ var App;
 
     //Vars
     App.page = 0;
-    App.max_selects = 5;
+    App.max_selects = 7;
     App.candidatosSelected = [];
     App.candidatosDetalleSelected = [];
     App.colors = ['blue', 'green', 'purple', 'orange', 'red', 'pink', 'brown'];
