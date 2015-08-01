@@ -179,6 +179,22 @@ div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.
 	border-color: #F7931E !important;
 }
 
+div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.selected div.color-red {
+    background-color: #FF0000!important;
+    border-color: #FF0000 !important;
+}
+
+div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.selected div.color-pink {
+    background-color: #EE66AA !important;
+    border-color: #EE66AA !important;
+}
+
+div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.selected div.color-brown {
+    background-color: #8A6343 !important;
+    border-color: #8A6343 !important;
+}
+
+
 div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.selected div.selection {
 	width:56px; 
 	height:56px;
@@ -204,6 +220,18 @@ div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.
 
 div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.border-color-orange {
 	border-color: #F7931E !important;
+}
+
+div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.border-color-red {
+    border-color: #FF0000 !important;
+}
+
+div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.border-color-pink {
+    border-color: #EE66AA !important;
+}
+
+div.contenedor div.contenidos div.slider-container div.candidatos div.slide div.border-color-brown {
+    border-color: #8A6343 !important;
 }
 
 /*--------- SELECTED --------*/
@@ -558,7 +586,25 @@ div.contenedor div.contenidos div.select-container .select2-container .selected-
 .qtip-orange {
 	background-color: #F7931E;
 	border-color: #F7931E;
-	color:#000 !important;
+	color:#FFF !important;
+}
+
+div.contenedor div.contenidos div.select-container .select2-container .selected-reference-red,
+.qtip-red {
+    background-color: #FF0000;
+    border-color: #FF0000;
+}
+
+div.contenedor div.contenidos div.select-container .select2-container .selected-reference-pink,
+.qtip-pink {
+    background-color: #EE66AA;
+    border-color: #EE66AA;
+}
+
+div.contenedor div.contenidos div.select-container .select2-container .selected-reference-brown,
+.qtip-brown {
+    background-color: #8A6343;
+    border-color: #8A6343;
 }
 
 div.contenedor div.contenidos div.select-container .select2-container .selected-reference-orange,
@@ -627,6 +673,21 @@ circle.participacion-orange {
 	fill: #F7931E;
 }
 
+circle.participacion-red {
+    stroke: #FF0000;
+    fill: #FF0000;
+}
+
+circle.participacion-pink {
+    stroke: #EE66AA;
+    fill: #EE66AA;
+}
+
+circle.participacion-brown {
+    stroke: #8A6343;
+    fill: #8A6343;
+}
+
 circle.participacion-inactivo {
 	fill: #D1D1D1;
 }
@@ -655,6 +716,19 @@ path.line-green {
 path.line-orange {
 	stroke: #F7931E;
 }
+
+path.line-red {
+    stroke: #FF0000;
+}
+
+path.line-pink {
+    stroke: #EE66AA;
+}
+
+path.line-brown {
+    stroke: #8A6343;
+}
+
 
 .y .tick text {
 	font-weight: normal;

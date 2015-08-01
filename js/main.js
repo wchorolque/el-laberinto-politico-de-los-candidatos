@@ -22,6 +22,7 @@ var App;
     App.$contenedor = $(".contenedor");
     App.$slide = $(".slide");
     App.$candidatos = $(".candidatos");
+
     //App.$selectionContainer = $(".selected-candidatos");
     App.$selectContainer = $(".select-container");
     App.$sliderContainer = $(".slider-container");
@@ -38,9 +39,10 @@ var App;
 
     //Vars
     App.page = 0;
+    App.max_selects = 5;
     App.candidatosSelected = [];
     App.candidatosDetalleSelected = [];
-    App.colors = ['blue', 'green', 'purple', 'orange'];
+    App.colors = ['blue', 'green', 'purple', 'orange', 'red', 'pink', 'brown'];
 
     //Grap
     App.graph;
@@ -66,7 +68,7 @@ var App;
 
     App.getHash = function () {
         var hash = window.location.hash;
-        App.params.selectedIds = (hash) ? hash.substring(1).split('-').slice(0, 4) : [];
+        App.params.selectedIds = (hash) ? hash.substring(1).split('-').slice(0, App.max_selects) : [];
     };
 
     App.filesLoaded = function (error, results) {
@@ -156,7 +158,7 @@ var App;
     App.createSelect = function () {
         App.$selectContainer.html(App.selectListTemplate(App.dataFicha));
         var options = {
-            maximumSelectionSize: 4,
+            maximumSelectionSize: App.max_selects,
             placeholder: "Seleccioná hasta 4 políticos",
             formatSelection: App.formatSelect,
             escapeMarkup: function (m) {
@@ -230,7 +232,7 @@ var App;
         if (f.hasClass("selected") && !f.hasClass("ficha-hover")) {
             App.removeCandidato(f.data('id'));
         } else {
-            if (App.candidatosSelected.length < 4) {
+            if (App.candidatosSelected.length < App.max_selects) {
                 App.selectCandidato(f.data('id'));
             }
         }
@@ -348,7 +350,7 @@ var App;
 
     App.checkLimit = function () {
         //fichas
-        if (App.candidatosSelected.length == 4) {
+        if (App.candidatosSelected.length == App.max_selects) {
             App.$slide.find('.ficha').not('.selected').addClass('disabled');
         } else if (App.$slide.find('.disabled').size() > 0) {
             App.$slide.find('.ficha').not('.selected').removeClass('disabled');
