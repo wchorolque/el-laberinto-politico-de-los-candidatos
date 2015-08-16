@@ -159,7 +159,7 @@ var App;
         App.$selectContainer.html(App.selectListTemplate(App.dataFicha));
         var options = {
             maximumSelectionSize: App.max_selects,
-            placeholder: "Seleccioná hasta 4 políticos",
+            placeholder: "Seleccioná hasta " + App.max_selects + " políticos",
             formatSelection: App.formatSelect,
             escapeMarkup: function (m) {
                 return m;
