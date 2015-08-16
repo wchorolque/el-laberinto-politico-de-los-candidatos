@@ -1,18 +1,19 @@
 var App;
 
-;(function(global, document, BUILD, $, d3, Handlebars){
+(function (global, document, BUILD, $, d3, Handlebars) {
 
     "use strict";
 
     App = global.App = global.App || {};
 
     App.params = {
-        width:960,
+        width: 960,
+        height: 450,
         selectedIds: []
     };
 
     //Data
-    App.dataUrl = 'https://docs.google.com/spreadsheet/pub?key=0AjbfzXKdfMPDdEozb3g3dVRCbWdlT2tjeWppUEZ1LXc&output=csv&gid=';
+    App.dataUrl = 'https://docs.google.com/spreadsheets/d/1U2fp0D3ZEJbfdN4-4UxTt4qGkfWkrSZR2BYhRlCj3Ao/edit#gid=0';
     App.dataFicha;
     App.dataCandidato;
     App.dataDetalle;
@@ -21,6 +22,7 @@ var App;
     App.$contenedor = $(".contenedor");
     App.$slide = $(".slide");
     App.$candidatos = $(".candidatos");
+
     //App.$selectionContainer = $(".selected-candidatos");
     App.$selectContainer = $(".select-container");
     App.$sliderContainer = $(".slider-container");
@@ -37,145 +39,155 @@ var App;
 
     //Vars
     App.page = 0;
+    App.max_selects = 7;
     App.candidatosSelected = [];
     App.candidatosDetalleSelected = [];
-    App.colors = ['blue','green','purple','orange'];
+    App.colors = ['blue', 'green', 'purple', 'orange', 'red', 'pink', 'brown'];
 
     //Grap
     App.graph;
 
     /*SETUP START*/
 
-    App.init = function() {
+    App.init = function () {
         App.getHash();
         App.setSizes();
 
         queue()
-          .defer(d3.csv, BUILD+'data/candidatos.csv')
-          .defer(d3.csv, BUILD+'data/trayectorias.csv')
-          .defer(d3.csv, BUILD+'data/partidos.csv')
-          .awaitAll(App.filesLoaded);
+            .defer(d3.csv, BUILD + 'data/ministros.csv')
+            .defer(d3.csv, BUILD + 'data/gestiones.csv')
+            .defer(d3.csv, BUILD + 'data/ministerios.csv')
+            .awaitAll(App.filesLoaded);
 
     };
 
-    App.setSizes = function() {
+    App.setSizes = function () {
         App.$contenedor.width(App.params.width);
         App.$candidatos.width(App.params.width);
     };
 
-    App.getHash = function() {
+    App.getHash = function () {
         var hash = window.location.hash;
-        App.params.selectedIds = (hash)?hash.substring(1).split('-').slice(0,4):[];
+        App.params.selectedIds = (hash) ? hash.substring(1).split('-').slice(0, App.max_selects) : [];
     };
 
-    App.filesLoaded = function(error, results){
-        App.graph = d3.politicos('timeline-candidatos',App.params.width,results[2]);
+    App.filesLoaded = function (error, results) {
+        var info_personas = results[0];
+        var info_trayectorias = results[1];
+        var info_entidades = results[2];
 
-        App.dataLoaded(results[0]);
-        App.detailsLoaded(results[1]);
+        App.graph = d3.politicos('timeline-candidatos', App.params.width, info_entidades);
+        App.dataLoaded(info_personas);
+        App.detailsLoaded(info_trayectorias);
 
-        if(App.params.selectedIds.length>0){
+        if (App.params.selectedIds.length > 0) {
             App.selectInitial();
         }
     };
 
-    App.detailsLoaded = function(data){
+    App.detailsLoaded = function (data) {
         App.dataDetalle = d3.nest()
-            .key(function(d) { return parseInt(d.id_candidato); })
-            .map(data.filter(function(e){return (e.partido==="NADA")?false:true;}), d3.map);
+            .key(function (d) {
+                return parseInt(d.id_candidato);
+            })
+            .map(data.filter(function (e) {
+                return (e.partido === "NADA") ? false : true;
+            }), d3.map);
     };
 
-    App.dataLoaded = function(data){
-
+    App.dataLoaded = function (data) {
         App.dataFicha = data;
-
-        App.dataCandidato =  d3.nest()
-            .key(function(d) { return parseInt(d.id); })
+        App.dataCandidato = d3.nest()
+            .key(function (d) {
+                return parseInt(d.id);
+            })
             .map(App.dataFicha, d3.map);
 
-        App.$actionBtn.on('click',App.updateGraph);
-        App.$limpiarBtn.on('click',App.limpiar);
+        App.$actionBtn.on('click', App.updateGraph);
+        App.$limpiarBtn.on('click', App.limpiar);
         App.createSlide();
-        App.$sliderControl.on('click',App.toggleSlider);
+        App.$sliderControl.on('click', App.toggleSlider);
         App.createSelect();
 
-        App.$creditosBtn.on('click',App.openCreditos);
+        App.$creditosBtn.on('click', App.openCreditos);
 
     }
 
-    App.openCreditos = function() {
+    App.openCreditos = function () {
         Shadowbox.open({
-            content:    '#creditos-modal',
-            player:     "inline",
-            height:     432,
-            width:      500
+            content: '#creditos-modal',
+            player: "inline",
+            height: 432,
+            width: 500
         });
     }
 
-    App.limpiar = function() {
-        if(!$(this).hasClass('disabled')){
-            $.each(App.candidatosSelected,function(i,e){
+    App.limpiar = function () {
+        if (!$(this).hasClass('disabled')) {
+            $.each(App.candidatosSelected, function (i, e) {
                 App.removeCandidato(e.id);
             });
             App.cleanGraph();
         }
     }
 
-    App.selectInitial = function() {
-        $.each(App.params.selectedIds,function(i,e){
+    App.selectInitial = function () {
+        $.each(App.params.selectedIds, function (i, e) {
             App.selectCandidato(parseInt(e));
         });
         App.updateGraph();
     }
 
-    App.toggleSlider = function() {
-        var h = (App.$sliderContainer.height()==0)?192:0;
+    App.toggleSlider = function () {
+        var h = (App.$sliderContainer.height() == 0) ? 450 : 0;
         App.animateSliderContainer(h);
     }
 
-    App.animateSliderContainer = function(h) {
-        if(App.$sliderContainer.height()!=h){
+    App.animateSliderContainer = function (h) {
+        if (App.$sliderContainer.height() != h) {
             App.$sliderControl.toggleClass('mostrar');
-            App.$sliderContainer.clearQueue().animate({  height:h }, 800, "easeInOutCirc");
+            App.$sliderContainer.clearQueue().animate({height: h}, 800, "easeInOutCirc");
         }
     }
 
-    App.formatSelect = function(person,a,b) {
+    App.formatSelect = function (person, a, b) {
         var color = App.getColorCandidatosSelected(person.id);
-        return "<span class='selected-reference selected-reference-"+color+"'><span class='white-bg'>" + person.text + "</span></span>" ;
+        return "<span class='selected-reference selected-reference-" + color + "'><span class='white-bg'>" + person.text + "</span></span>";
     }
 
-    App.createSelect = function(){
+    App.createSelect = function () {
         App.$selectContainer.html(App.selectListTemplate(App.dataFicha));
-        var options = { 
-            maximumSelectionSize: 4,
-            placeholder: "Seleccioná hasta 4 políticos",
+        var options = {
+            maximumSelectionSize: App.max_selects,
+            placeholder: "Seleccioná hasta " + App.max_selects + " políticos",
             formatSelection: App.formatSelect,
-            escapeMarkup:function (m) { return m;}
+            escapeMarkup: function (m) {
+                return m;
+            }
         };
         App.$select = $('#select-politicos').select2(options);
 
-        App.$select.on("change", 
-                function(e) { 
-                    e.preventDefault();
-                    if(e.added)
-                        App.selectCandidato(e.added.id);
+        App.$select.on("change",
+            function (e) {
+                e.preventDefault();
+                if (e.added)
+                    App.selectCandidato(e.added.id);
 
-                    if(e.removed)
-                        App.removeCandidato(e.removed.id);
+                if (e.removed)
+                    App.removeCandidato(e.removed.id);
 
 
-                });
+            });
     }
 
-    App.createSlide = function(){
-        App.$slide.css('width',App.params.width);
+    App.createSlide = function () {
+        App.$slide.css('width', App.params.width);
         App.$slide.html(App.itemTemplate(App.dataFicha));
         App.$fichas = $('.ficha');
-        App.$fichas.on('click',App.clickFicha);
-        App.$fichas.hover(App.mouseEnterFicha,App.mouseLeaveFicha);
+        App.$fichas.on('click', App.clickFicha);
+        App.$fichas.hover(App.mouseEnterFicha, App.mouseLeaveFicha);
 
-        App.$fichas.each(function(){
+        App.$fichas.each(function () {
             $(this).qtip({
                 content: '<span>' + $(this).data('tooltip') + '</span>',
                 position: {
@@ -184,7 +196,7 @@ var App;
                     target: 'mouse',
                     adjust: {
                         mouse: true,
-                        y:30
+                        y: 30
                     }
                 },
                 show: {
@@ -201,167 +213,167 @@ var App;
 
     /*SELECT START*/
 
-    App.mouseEnterFicha = function(){
+    App.mouseEnterFicha = function () {
         var f = $(this);
-        if(!f.is(".disabled, .selected")){
-            App.onFicha(f,App.colors[0],true);
+        if (!f.is(".disabled, .selected")) {
+            App.onFicha(f, App.colors[0], true);
         }
     };
 
-    App.mouseLeaveFicha = function(){
+    App.mouseLeaveFicha = function () {
         var f = $(this);
-        if(f.hasClass('ficha-hover')){
-            App.offFicha(f,App.colors[0],true);
+        if (f.hasClass('ficha-hover')) {
+            App.offFicha(f, App.colors[0], true);
         }
     };
 
-    App.clickFicha = function(){
+    App.clickFicha = function () {
         var f = $(this);
-        if(f.hasClass("selected") && !f.hasClass("ficha-hover") ){
+        if (f.hasClass("selected") && !f.hasClass("ficha-hover")) {
             App.removeCandidato(f.data('id'));
-        }else{
-            if(App.candidatosSelected.length<4){
+        } else {
+            if (App.candidatosSelected.length < App.max_selects) {
                 App.selectCandidato(f.data('id'));
             }
         }
     };
 
-    App.onFicha = function(f,color,hover){
-        if(hover){
-            f.addClass("ficha-hover"); 
+    App.onFicha = function (f, color, hover) {
+        if (hover) {
+            f.addClass("ficha-hover");
         } else {
-            f.removeClass("ficha-hover"); 
+            f.removeClass("ficha-hover");
         }
         f.addClass("selected");
-        f.find('.selection').addClass('border-color-'+color);
-        f.find('.check').addClass('color-'+color);
+        f.find('.selection').addClass('border-color-' + color);
+        f.find('.check').addClass('color-' + color);
     };
 
-    App.offFicha = function(f,color,hover){
-        if(hover){
-           f.removeClass("ficha-hover"); 
+    App.offFicha = function (f, color, hover) {
+        if (hover) {
+            f.removeClass("ficha-hover");
         }
         f.removeClass("selected");
-        f.find('.selection').removeClass('border-color-'+color);
-        f.find('.check').removeClass('color-'+color);
+        f.find('.selection').removeClass('border-color-' + color);
+        f.find('.check').removeClass('color-' + color);
     };
 
-    App.setSelectedHash = function(){
+    App.setSelectedHash = function () {
         window.location.hash = App.candidatosSelected
-            .reduce(function(previousValue, currentValue, index, array){
-                return (previousValue)?previousValue + '-' + currentValue.id:'' + currentValue.id;
-              }
-              ,''
-            );
+            .reduce(function (previousValue, currentValue, index, array) {
+                return (previousValue) ? previousValue + '-' + currentValue.id : '' + currentValue.id;
+            }
+            , ''
+        );
     };
 
-    App.selectCandidato = function(id){
+    App.selectCandidato = function (id) {
 
         var candidato = App.getDataCandidato(id),
-            f = App.$slide.find('#ficha-'+id);
-        
+            f = App.$slide.find('#ficha-' + id);
+
         //Slider
         candidato.color = App.colors.shift();
 
         //CSS de la ficha
-        App.onFicha(f,candidato.color,false);
+        App.onFicha(f, candidato.color, false);
 
         //Selected
         App.candidatosSelected.push(candidato);
-        
+
         //Data for graph
         App.candidatosDetalleSelected = App.candidatosDetalleSelected.concat(App.getDetalleCandidato(id));
 
         //Select
         var m = App.$select.select2("val");
-        App.$select.select2("val",m.concat([id+""]));
-        
+        App.$select.select2("val", m.concat([id + ""]));
+
         //Check
         App.checkLimit();
     };
 
-    App.removeCandidato = function(id){
-        var f = App.$slide.find('#ficha-'+id);
-            
+    App.removeCandidato = function (id) {
+        var f = App.$slide.find('#ficha-' + id);
+
         //Selected
         var m = [];
-        App.candidatosSelected = App.candidatosSelected.filter(function(a){
-            if(a.id==id){
+        App.candidatosSelected = App.candidatosSelected.filter(function (a) {
+            if (a.id == id) {
                 App.colors.push(a.color);
-                App.offFicha(f,a.color,false);
+                App.offFicha(f, a.color, false);
                 return false;
             }
-            m.push(a.id+"");
+            m.push(a.id + "");
             return true;
         });
 
-        App.candidatosDetalleSelected = App.candidatosDetalleSelected.filter(function(a){
-            if(a.id_candidato==id){
+        App.candidatosDetalleSelected = App.candidatosDetalleSelected.filter(function (a) {
+            if (a.id_candidato == id) {
                 return false;
             }
             return true;
         });
-        
+
         //Select
-        App.$select.select2("val",m);
+        App.$select.select2("val", m);
 
         App.checkLimit();
     };
 
-    App.getColorCandidatosSelected = function(id){
-        var r = App.candidatosSelected.filter(function(a){
-            if(a.id==id){
+    App.getColorCandidatosSelected = function (id) {
+        var r = App.candidatosSelected.filter(function (a) {
+            if (a.id == id) {
                 return true;
             }
             return false;
         })[0];
 
-        r = (r)?r.color:false;
+        r = (r) ? r.color : false;
 
         return r;
     };
 
-    App.cleanGraph = function(){
-        App.animateSliderContainer(192);
-        App.graph.update([],[]);
+    App.cleanGraph = function () {
+        App.animateSliderContainer(450);
+        App.graph.update([], []);
     };
 
-    App.updateGraph = function(){
-        if(!$(this).hasClass('disabled')){
-            $('body,html').animate({scrollTop : 155},'slow');
+    App.updateGraph = function () {
+        if (!$(this).hasClass('disabled')) {
+            $('body,html').animate({scrollTop: 155}, 'slow');
             App.$referenceblock.show();
             App.setSelectedHash();
             App.animateSliderContainer(0);
-            App.graph.update(App.candidatosDetalleSelected,App.candidatosSelected);
+            App.graph.update(App.candidatosDetalleSelected, App.candidatosSelected);
         }
     };
 
-    App.checkLimit = function(){
+    App.checkLimit = function () {
         //fichas
-        if(App.candidatosSelected.length==4){
+        if (App.candidatosSelected.length == App.max_selects) {
             App.$slide.find('.ficha').not('.selected').addClass('disabled');
-        } else if (App.$slide.find('.disabled').size()>0){
+        } else if (App.$slide.find('.disabled').size() > 0) {
             App.$slide.find('.ficha').not('.selected').removeClass('disabled');
         }
 
         //btn
-        if(App.candidatosSelected.length==0){
+        if (App.candidatosSelected.length == 0) {
             App.$limpiarBtn.addClass('disabled');
             App.$actionBtn.addClass('disabled');
-        }else if(App.candidatosSelected.length==1){
+        } else if (App.candidatosSelected.length == 1) {
             App.$actionBtn.html("VER RECORRIDO").removeClass('disabled');
             App.$limpiarBtn.removeClass('disabled');
-        }else{
+        } else {
             App.$actionBtn.html("COMPARAR");
         }
     };
 
-    App.getDataCandidato = function(id){
+    App.getDataCandidato = function (id) {
         return App.dataCandidato.get(id)[0];
     };
 
-    App.getDetalleCandidato = function(id){
-        return (App.dataDetalle.get(id))?App.dataDetalle.get(id):[];
+    App.getDetalleCandidato = function (id) {
+        return (App.dataDetalle.get(id)) ? App.dataDetalle.get(id) : [];
     };
 
     /*SELECT END*/
@@ -369,31 +381,30 @@ var App;
 
 })(window, document, BUILD, jQuery, d3, Handlebars);
 
-window.onload = function() {
+window.onload = function () {
     var opts = {
-        fb:{
-            title:'El laberinto político de los candidatos',
-            text:'Visualizá el camino que realizaron los candidatos a través de las últimas elecciones. En qué partido estuvieron y con quiénes. - lanacion.com',
-            img: 'http://interactivos.lanacion.com.ar/candidatos/'+BUILD+'img/screen.png'
+        fb: {
+            title: 'El laberinto político de los candidatos',
+            text: 'Visualizá el camino que realizaron los candidatos a través de las últimas elecciones. En qué partido estuvieron y con quiénes. - lanacion.com',
+            img: 'http://interactivos.lanacion.com.ar/candidatos/' + BUILD + 'img/screen.png'
         },
-        tw:{
-            text:'Conocé el laberinto político de los candidatos',
-            related : 'lndata',
+        tw: {
+            text: 'Conocé el laberinto político de los candidatos',
+            related: 'lndata',
             via: 'lanacioncom',
             ht: 'ddj,dataviz'
         },
-        em:{
-            subject:'El laberinto político de los candidatos',
-            body:'Visualizá el camino que realizaron los candidatos a través de las últimas elecciones. En qué partido estuvieron y con quiénes.'
+        em: {
+            subject: 'El laberinto político de los candidatos',
+            body: 'Visualizá el camino que realizaron los candidatos a través de las últimas elecciones. En qué partido estuvieron y con quiénes.'
         },
-        getUrl: function(via){
+        getUrl: function (via) {
             //return 'http://interactivos.lanacion.com.ar/candidatos/'+window.location.hash;
-            return window.location.origin+window.location.pathname+window.location.hash;
+            return window.location.origin + window.location.pathname + window.location.hash;
         }
     };
 
-    App.init(); 
+    App.init();
     MiniShare.init(opts);
     Shadowbox.init();
-
 }
